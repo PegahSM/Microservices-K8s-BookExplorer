@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: streamlit-ui
+  namespace: book-explorer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: streamlit-ui
+  template:
+    metadata:
+      labels:
+        app: streamlit-ui
+    spec:
+      containers:
+      - name: ui
+        image: pegahsm/streamlit-ui:8.0
+        ports:
+        - containerPort: 8501
+        #service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: streamlit-ui
+  namespace: book-explorer
+spec:
+  selector:
+    app: streamlit-ui
+  ports:
+  - port: 80
+    targetPort: 8501

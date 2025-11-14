@@ -1,0 +1,32 @@
+from fastapi.testclient import TestClient
+import json
+import httpx
+import respx
+from main import app
+
+client = TestClient(app)
+
+@respx.mock
+def test_get_book_ok():
+    olid = "OL7353617M"
+    # Mock the Open Library call your code makes
+    respx.get(f"https://openlibrary.org/books/{olid}.json").mock(
+        return_value=httpx.Response(
+            200,
+            json={"title": "Example", "authors": [], "first_publish_year": 1954}
+        )
+    )
+    r = client.get(f"/books/{olid}")
+    assert r.status_code == 200
+    data = r.json()
+    assert data["olid"] == olid
+    assert data["title"] == "Example"
+
+@respx.mock
+def test_get_book_not_found():
+    olid = "DOES_NOT_EXIST"
+    respx.get(f"https://openlibrary.org/books/{olid}.json").mock(
+        return_value=httpx.Response(404)
+    )
+    r = client.get(f"/books/{olid}")
+    assert r.status_code == 404 or r.status_code == 400

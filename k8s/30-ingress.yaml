@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: book-explorer
+  namespace: book-explorer
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path:  /api/catalog
+        pathType: Prefix
+        backend:
+          service:
+            name: catalog-svc
+            port:
+              number: 80
+      - path: /api/review
+        pathType: Prefix
+        backend:
+          service:
+            name: review-svc
+            port:
+              number: 8000
+

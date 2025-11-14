@@ -1,0 +1,19 @@
+FROM python:3.11-slim
+
+# 1) System setup
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# 2) Install deps first (better layer caching)
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 3) Copy code last
+COPY . .
+
+# 4) Expose port & run
+EXPOSE 8000
+# DATABASE_URL is injected at runtime (docker run / Kubernetes)
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
